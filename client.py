@@ -1,11 +1,16 @@
 import socket
 import threading
+import rsa
+import utils
 
 class Client:
     def __init__(self, server_ip: str, port: int, username: str) -> None:
         self.server_ip = server_ip
         self.port = port
         self.username = username
+        self.public_key = ""
+        self.private_key = ""
+        self.serverkey = ""
 
     def init_connection(self):
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -19,36 +24,45 @@ class Client:
 
         # create key pairs
 
-        # exchange public keys
+        self.public_key, self.private_key = rsa.generate_keypair()
 
-        # receive the encrypted secret key
+        # recieve server's public key
+
+        self.serverkey = self.s.recv(1024).decode().split()
+
+        # send client's public key to the server
+
+        self.s.send(" ".join(self.public_key).encode())
+
 
         message_handler = threading.Thread(target=self.read_handler,args=())
         message_handler.start()
         input_handler = threading.Thread(target=self.write_handler,args=())
         input_handler.start()
 
-    def read_handler(self): 
+    def read_handler(self):
         while True:
-            message = self.s.recv(1024).decode()
+            data = self.s.recv(1024).decode()
+            message = data[:64]
+            msg_hash = data[-64:]
 
-            # decrypt message with the secrete key
+            decrypted_message = rsa.decrypt(message, self.private_key)
 
-            # ... 
+            if msg_hash != utils.calculate_hash(decrypted_message):
+                print("Hash mismatch!")
 
-
-            print(message)
+            print("Encrypted:", message)
+            print("Decrypted:", decrypted_message)
 
     def write_handler(self):
         while True:
             message = input()
 
-            # encrypt message with the secrete key
+            encrypted_message = rsa.encrypt(message, self.serverkey)
 
-            # ...
-
-            self.s.send(message.encode())
+            self.s.send(encrypted_message.encode())
 
 if __name__ == "__main__":
-    cl = Client("127.0.0.1", 9001, "b_g")
+    username = input("Enter your username: ")
+    cl = Client("127.0.0.1", 9001, username)
     cl.init_connection()
