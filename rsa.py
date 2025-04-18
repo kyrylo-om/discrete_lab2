@@ -24,7 +24,27 @@ def generate_keypair(length):
     return (e, n), (d, n)
 
 def encrypt(message, public_key):
-    return ""
+    e, n = public_key
+
+    N = 1
+    while int("25" * N) < n:
+        N += 1
+
+    ord_message = []
+    block = ""
+    message = message.lower()
+    for char in message:
+        block += f"{ord(char) - 97:0{2}}"
+        if len(block) >= 2 * N:
+            ord_message.append(block)
+            block = ""
+    if block != "":
+        while len(block) < 2 * N:
+            # 99 - фіктивний символ
+            block += "99"
+        ord_message.append(block)
+
+    return " ".join([str(utils.modexp(int(block), e, n)) for block in ord_message])
 
 def decrypt(message, private_key):
     return ""
