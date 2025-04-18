@@ -24,15 +24,16 @@ class Client:
 
         # create key pairs
 
-        self.public_key, self.private_key = rsa.generate_keypair()
+        self.public_key, self.private_key = rsa.generate_keypair(4)
 
         # recieve server's public key
 
-        self.serverkey = self.s.recv(1024).decode().split()
+        self.serverkey = list(map(int, self.s.recv(1024).decode().split()))
+        print("Server's public key:", list(self.serverkey))
 
         # send client's public key to the server
 
-        self.s.send(" ".join(self.public_key).encode())
+        self.s.send(" ".join(map(str, self.public_key)).encode())
 
 
         message_handler = threading.Thread(target=self.read_handler,args=())
@@ -43,8 +44,8 @@ class Client:
     def read_handler(self):
         while True:
             data = self.s.recv(1024).decode()
-            message = data[:64]
-            msg_hash = data[-64:]
+            message = data[64:]
+            msg_hash = data[:64]
 
             decrypted_message = rsa.decrypt(message, self.private_key)
 
