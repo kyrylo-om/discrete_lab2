@@ -26,9 +26,7 @@ def generate_keypair(length):
 def encrypt(message, public_key):
     e, n = public_key
 
-    N = 1
-    while int("25" * N) < n:
-        N += 1
+    N = utils.calculate_max_N(n)
 
     ord_message = []
     block = ""
