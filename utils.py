@@ -67,6 +67,6 @@ def modexp(a, b, m):
 
 def calculate_max_N(n):
     N = 1
-    while int("25" * N) < n:
+    while int("25" * (N + 1)) < n:
         N += 1
     return N
