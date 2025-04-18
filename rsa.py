@@ -45,4 +45,22 @@ def encrypt(message, public_key):
     return " ".join([str(utils.modexp(int(block), e, n)) for block in ord_message])
 
 def decrypt(message, private_key):
-    return ""
+    # Декодуємо кожен блок за допомогою приватного ключа
+    blocks = message.strip().split()
+    decrypted_blocks = [str(decrypt_block(int(block), private_key)) for block in blocks]
+
+    # Дізнаємось довжину блоку: N * 2 (бо кожна літера — 2 цифри)
+    block_length = calculate_max_N() * 2
+
+    # Заповнюємо нулями зліва до block_length
+    numeric_string = ''.join(block.zfill(block_length) for block in decrypted_blocks)
+
+    # Декодуємо повідомлення по 2 цифри
+    decoded_message = ""
+    for i in range(0, len(numeric_string), 2):
+        code = int(numeric_string[i:i+2])
+        if code < 26:  # 0-25 для A-Z
+            decoded_message += chr(ord('A') + code)
+        # Інакше — фіктивний символ, пропускаємо
+
+    return decoded_message
