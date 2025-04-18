@@ -25,7 +25,6 @@ class Server:
             c, addr = self.s.accept()
             username = c.recv(1024).decode()
             print(f"{username} tries to connect")
-            self.broadcast(f'new person has joined: {username}', c)
             self.username_lookup[c] = username
             self.clients.append(c)
 
