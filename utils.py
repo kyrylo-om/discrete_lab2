@@ -1,10 +1,14 @@
 import random
 import math
+import hashlib
+from rsa import decrypt_block
+from utils import calculate_max_N
 
 def calculate_hash(message):
-    # It is important for the hash to be exactly 64 symbols long.
-
-    return "0"*64
+    # Використовуємо SHA-256 з hashlib
+    hash_value = hashlib.sha256(message.encode()).hexdigest()
+    # Повертаємо рівно 64 символи (SHA-256 завжди дає 64 hex символи)
+    return hash_value
 
 def is_prime(n):
     if n <= 1:
