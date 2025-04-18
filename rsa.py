@@ -44,23 +44,26 @@ def encrypt(message, public_key):
 
     return " ".join([str(utils.modexp(int(block), e, n)) for block in ord_message])
 
+def decrypt_block(block, d, n):
+    return pow(block, d, n)
+
 def decrypt(message, private_key):
-    # Декодуємо кожен блок за допомогою приватного ключа
-    blocks = message.strip().split()
-    decrypted_blocks = [str(decrypt_block(int(block), private_key)) for block in blocks]
+    d, n = private_key
+    block_length = 2 * utils.calculate_max_N(n)
 
-    # Дізнаємось довжину блоку: N * 2 (бо кожна літера — 2 цифри)
-    block_length = calculate_max_N() * 2
+    decrypted_blocks = []
+    for block in message.strip().split():
+        decrypted_num = str(decrypt_block(int(block), d, n))
+        # Pad the block with leading zeros
+        decrypted_blocks.append(decrypted_num.zfill(block_length))
 
-    # Заповнюємо нулями зліва до block_length
-    numeric_string = ''.join(block.zfill(block_length) for block in decrypted_blocks)
+    all_numbers = ''.join(decrypted_blocks)
+    plaintext = ""
 
-    # Декодуємо повідомлення по 2 цифри
-    decoded_message = ""
-    for i in range(0, len(numeric_string), 2):
-        code = int(numeric_string[i:i+2])
-        if code < 26:  # 0-25 для A-Z
-            decoded_message += chr(ord('A') + code)
-        # Інакше — фіктивний символ, пропускаємо
+    for i in range(0, len(all_numbers), 2):
+        num = int(all_numbers[i:i+2])
+        if 0 <= num <= 25:
+            plaintext += chr(ord('A') + num)
+        # Skip invalid numbers like 99, 98, etc.
 
-    return decoded_message
+    return plaintext
