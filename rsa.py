@@ -42,7 +42,7 @@ def encrypt(message, public_key):
             block += "99"
         ord_message.append(block)
 
-    return " ".join([str(utils.modexp(int(block), e, n)) for block in ord_message])
+    return " ".join([str(pow(int(block), e, n)) for block in ord_message])
 
 def decrypt_block(block, d, n):
     return pow(block, d, n)
