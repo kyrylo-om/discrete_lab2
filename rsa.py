@@ -53,9 +53,7 @@ def decrypt(message, private_key):
 
     decrypted_blocks = []
     for block in message.strip().split():
-        decrypted_num = str(decrypt_block(int(block), d, n))
-        # Pad the block with leading zeros
-        decrypted_blocks.append(decrypted_num.zfill(block_length))
+        decrypted_blocks.append(str(decrypt_block(int(block), d, n)).zfill(block_length))
 
     all_numbers = ''.join(decrypted_blocks)
     plaintext = ""
