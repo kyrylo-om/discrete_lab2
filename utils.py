@@ -1,8 +1,6 @@
 import random
 import math
 import hashlib
-from rsa import decrypt_block
-from utils import calculate_max_N
 
 def calculate_hash(message):
     # Використовуємо SHA-256 з hashlib
